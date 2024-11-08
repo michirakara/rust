@@ -293,7 +293,7 @@ macro_rules! step_integer_impls {
                 step_signed_methods!($u_narrower);
 
                 #[inline]
-                fn steps_between(start: &Self, end: &Self) -> (usize,Option<usize>) {
+                fn steps_between(start: &Self, end: &Self) -> (usize, Option<usize>) {
                     if *start <= *end {
                         // This relies on $i_narrower <= usize
                         //
@@ -303,7 +303,7 @@ macro_rules! step_integer_impls {
                         let steps = (*end as isize).wrapping_sub(*start as isize) as usize;
                         (steps, Some(steps))
                     } else {
-                        (0,None)
+                        (0, None)
                     }
                 }
 
@@ -359,15 +359,15 @@ macro_rules! step_integer_impls {
                 step_unsigned_methods!();
 
                 #[inline]
-                fn steps_between(start: &Self, end: &Self) -> (usize,Option<usize>) {
+                fn steps_between(start: &Self, end: &Self) -> (usize, Option<usize>) {
                     if *start <= *end {
                         if let Ok(steps) = usize::try_from(*end - *start) {
-                            (steps,Some(steps))
+                            (steps, Some(steps))
                         }else{
-                            (usize::MAX,None)
+                            (usize::MAX, None)
                         }
                     } else {
-                        (0,None)
+                        (0, None)
                     }
                 }
 
@@ -389,12 +389,12 @@ macro_rules! step_integer_impls {
                 step_signed_methods!($u_wider);
 
                 #[inline]
-                fn steps_between(start: &Self, end: &Self) -> (usize,Option<usize>) {
+                fn steps_between(start: &Self, end: &Self) -> (usize, Option<usize>) {
                     if *start <= *end {
                         match end.checked_sub(*start) {
                             Some(result) => {
                                 if let Ok(steps) = usize::try_from(result) {
-                                    (steps,Some(steps))
+                                    (steps, Some(steps))
                                 }else{
                                     (usize::MAX, None)
                                 }
@@ -404,7 +404,7 @@ macro_rules! step_integer_impls {
                             None => (usize::MAX, None),
                         }
                     } else {
-                        (0,None)
+                        (0, None)
                     }
                 }
 
