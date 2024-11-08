@@ -23,7 +23,7 @@ unsafe_impl_trusted_step![AsciiChar char i8 i16 i32 i64 i128 isize u8 u16 u32 u6
 #[unstable(feature = "step_trait", issue = "42168")]
 pub trait Step: Clone + PartialOrd + Sized {
     /// Returns the bounds on the number of *successor* steps required to get from `start` to `end`
-    /// like [`Iterator::size_hint()`][std::iter::Iterator::size_hint()].
+    /// like [`Iterator::size_hint()`][Iterator::size_hint()].
     ///
     /// Returns `(usize::MAX, None)` if the number of steps would overflow `usize`, or is infinite.
     ///
