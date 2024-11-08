@@ -259,12 +259,13 @@ macro_rules! step_integer_impls {
                 step_unsigned_methods!();
 
                 #[inline]
-                fn steps_between(start: &Self, end: &Self) -> (usize,Option<usize>) {
+                fn steps_between(start: &Self, end: &Self) -> (usize, Option<usize>) {
                     if *start <= *end {
                         // This relies on $u_narrower <= usize
-                        ((*end-*start) as usize, Some((*end - *start) as usize))
+                        let steps = (*end - *start) as usize;
+                        (steps, Some(steps))
                     } else {
-                        (0,None)
+                        (0, None)
                     }
                 }
 
@@ -299,7 +300,8 @@ macro_rules! step_integer_impls {
                         // Casting to isize extends the width but preserves the sign.
                         // Use wrapping_sub in isize space and cast to usize to compute
                         // the difference that might not fit inside the range of isize.
-                        ((*end as isize).wrapping_sub(*start as isize) as usize,Some((*end as isize).wrapping_sub(*start as isize) as usize))
+                        let steps = (*end as isize).wrapping_sub(*start as isize) as usize;
+                        (steps, Some(steps))
                     } else {
                         (0,None)
                     }
@@ -707,7 +709,7 @@ impl<A: Step> RangeIteratorImpl for ops::Range<A> {
     #[inline]
     default fn spec_advance_by(&mut self, n: usize) -> Result<(), NonZero<usize>> {
         let steps = Step::steps_between(&self.start, &self.end);
-        let available = if let Some(steps) = steps.1 { steps } else { steps.0 };
+        let available = steps.1.unwrap_or(steps.0);
 
         let taken = available.min(n);
 
@@ -745,7 +747,7 @@ impl<A: Step> RangeIteratorImpl for ops::Range<A> {
     #[inline]
     default fn spec_advance_back_by(&mut self, n: usize) -> Result<(), NonZero<usize>> {
         let steps = Step::steps_between(&self.start, &self.end);
-        let available = if let Some(steps) = steps.1 { steps } else { steps.0 };
+        let available = steps.1.unwrap_or(steps.0);
 
         let taken = available.min(n);
 
@@ -786,7 +788,7 @@ impl<T: TrustedStep> RangeIteratorImpl for ops::Range<T> {
     #[inline]
     fn spec_advance_by(&mut self, n: usize) -> Result<(), NonZero<usize>> {
         let steps = Step::steps_between(&self.start, &self.end);
-        let available = if let Some(steps) = steps.1 { steps } else { steps.0 };
+        let available = steps.1.unwrap_or(steps.0);
 
         let taken = available.min(n);
 
@@ -827,7 +829,7 @@ impl<T: TrustedStep> RangeIteratorImpl for ops::Range<T> {
     #[inline]
     fn spec_advance_back_by(&mut self, n: usize) -> Result<(), NonZero<usize>> {
         let steps = Step::steps_between(&self.start, &self.end);
-        let available = if let Some(steps) = steps.1 { steps } else { steps.0 };
+        let available = steps.1.unwrap_or(steps.0);
 
         let taken = available.min(n);
 
@@ -850,9 +852,9 @@ impl<A: Step> Iterator for ops::Range<A> {
     #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
         if self.start < self.end {
-            (0, Some(0))
-        } else {
             Step::steps_between(&self.start, &self.end)
+        } else {
+            (0, Some(0))
         }
     }
 
